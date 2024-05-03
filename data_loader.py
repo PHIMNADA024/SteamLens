@@ -118,6 +118,23 @@ class DataLoader:
             print(f"Error: {data_file} not found.")
             self.__data = pd.DataFrame()
 
+    @staticmethod
+    def combine_platform(game) -> str:
+        """
+        Combines platform information for a game into a single string.
+
+        :param game: A row representing a game in the DataFrame.
+        :return: A string containing the combined platform information.
+        """
+        platform = []
+        if game["Windows"]:
+            platform.append("Windows")
+        if game["Mac"]:
+            platform.append("Mac")
+        if game["Linux"]:
+            platform.append("Linux")
+        return ",".join(platform)
+
     def preprocess_data(self) -> None:
         """
         Preprocesses the loaded data.
@@ -129,3 +146,4 @@ class DataLoader:
                 ("Information not available"))
         self.__data[['Developers', 'Publishers', 'Categories', 'Genres', 'Tags']] = \
             (self.__data[['Developers', 'Publishers', 'Categories', 'Genres', 'Tags']].fillna("Unknown"))
+        self.__data["Platform"] = self.__data.apply(self.combine_platform, axis=1)
