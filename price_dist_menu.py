@@ -69,14 +69,15 @@ class PriceDistMenu(tk.Frame):
 
         :returns: The descriptive statistics text.
         """
+        price_stats = self.graph_controller.get_descriptive_statistics("Price")
         descriptive_stats = (
-            f"Count: {self.graph_controller.price_dist_statistics()['count']}\n"
-            f"Mean: {self.graph_controller.price_dist_statistics()['mean']:.2f}\n"
-            f"Std Deviation: {self.graph_controller.price_dist_statistics()['std']:.2f}\n"
-            f"Minimum: {self.graph_controller.price_dist_statistics()['min']:.2f}\n"
-            f"25th Percentile: {self.graph_controller.price_dist_statistics()['25%']:.2f}\n"
-            f"Median: {self.graph_controller.price_dist_statistics()['50%']:.2f}\n"
-            f"75th Percentile: {self.graph_controller.price_dist_statistics()['75%']:.2f}\n"
-            f"Maximum: {self.graph_controller.price_dist_statistics()['max']:.2f}\n"
+            f"Count: {price_stats['count']}\n"
+            f"Mean: {price_stats['mean']:.2f}\n"
+            f"Std Deviation: {price_stats['std']:.2f}\n"
+            f"Minimum: {price_stats['min']:.2f}\n"
+            f"25th Percentile: {price_stats['25%']:.2f}\n"
+            f"Median: {price_stats['50%']:.2f}\n"
+            f"75th Percentile: {price_stats['75%']:.2f}\n"
+            f"Maximum: {price_stats['max']:.2f}\n"
         )
         return descriptive_stats
