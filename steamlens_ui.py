@@ -57,6 +57,8 @@ class SteamLensUI(tk.Tk):
                                 command=lambda: self.change_to_menu(self.relationship_menu))
         menu_choice.add_command(label="Games Insights Dashboard",
                                 command=lambda: self.change_to_menu(self.dashboard_menu))
+        menu_choice.add_separator()
+        menu_choice.add_command(label="Quit", command=self.quit)
         menubar.config(menu=menu_choice)
         menu_frame.pack(fill=tk.X)
 
