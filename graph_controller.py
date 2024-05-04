@@ -5,6 +5,7 @@ import matplotlib
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import numpy as np
+
 matplotlib.use("TkAgg")
 
 
@@ -18,6 +19,7 @@ class GraphController:
         Initializes the GraphController instance.
         """
         self.data_loader = DataLoader.get_instance()
+        self.selected_games = None
 
     def get_data(self) -> pd.DataFrame:
         """
@@ -54,10 +56,37 @@ class GraphController:
         """
         return self.data_loader.unique_tags
 
+    def get_sorting_attributes(self) -> list[str]:
+        """
+        Retrieves sorting attributes.
+        :return: List of sorting attributes.
+        """
+        return self.data_loader.sorting_attributes
+
+    @staticmethod
+    def get_categorical_data() -> list[str]:
+        """
+        Retrieves categorical data options.
+
+        :return: List of categorical data options.
+        """
+        return ["Platform", "Categories", "Genres", "Tags"]
+
+    def get_descriptive_statistics(self, attribute: str) -> pd.Series:
+        """
+        Shows descriptive statistics of an attribute.
+
+        :param attribute: The attribute for which statistics are calculated.
+        :return: Series containing descriptive statistics.
+        """
+        return self.get_data()[attribute].describe()
+
     def price_dist_graph(self, parent) -> tk.Widget:
         """
         Creates a price distribution histogram graph.
+
         :param parent: The parent tkinter widget where the graph will be embedded.
+        :return: The Tkinter widget containing the price distribution histogram graph.
         """
         fig, ax = plt.subplots(figsize=(8, 6))
 
@@ -75,11 +104,102 @@ class GraphController:
 
         return canvas.get_tk_widget()
 
-    def price_dist_statistics(self) -> pd.Series:
+    def released_year_graph(self, parent) -> tk.Widget:
         """
-        Shows descriptive statistics of price distribution.
-        """
-        price_data = self.get_data()["Price"]
-        statistics = price_data.describe()
+        Creates a graph showing the number of games released each year based on top genres.
 
-        return statistics
+        :param parent: The parent tkinter widget where the graph will be embedded.
+        :return: The Tkinter widget containing the released year graph.
+        """
+
+        data = self.get_data().copy()
+        data["Genres"] = data["Genres"].copy().str.split(",").explode('Genres')
+        data["Release Year"] = data["Release date"].str.slice(-4).astype('int')
+
+        # Count the number of games for each genre and year
+        genre_counts = data.groupby(['Release Year', 'Genres']).size().unstack(fill_value=0)
+
+        # Find the top 5 genres with the most games released each year
+        top_genres = genre_counts.sum().nlargest(5).index
+
+        # Plot lines for the top 5 genres
+        ax = genre_counts[top_genres].plot(figsize=(10, 6), marker='o', linestyle='-')
+
+        # Set titles and labels
+        ax.set_title('Number of games released each year based on top 5 genres')
+        ax.set_xlabel('Release Year')
+        ax.set_ylabel('Number of Games')
+        years = range(data['Release Year'].min(), data['Release Year'].max() + 1)
+        ax.set_xticks(years)
+        xtick_labels = [year if year % 5 == 0 else "" for year in years]
+        ax.set_xticklabels(xtick_labels, rotation=90)
+        # ax.set_xticklabels(years, rotation=90)
+
+        ax.grid()
+
+        canvas = FigureCanvasTkAgg(ax.get_figure(), master=parent)
+        canvas.draw()
+
+        return canvas.get_tk_widget()
+
+    def relationship_graph(self, parent, left_col, right_col) -> tk.Widget:
+        """
+        Creates a scatter plot to show the relationship between two columns.
+        :param parent: The parent tkinter widget where the graph will be embedded.
+        :param left_col: The name of the column to be plotted on the x-axis.
+        :param right_col: The name of the column to be plotted on the y-axis.
+        :return: The Tkinter widget containing the scatter plot.
+        """
+        fig, ax = plt.subplots(figsize=(8, 6))
+
+        data = self.get_data()
+        x_data = data[left_col]
+        y_data = data[right_col]
+
+        ax.scatter(x_data, y_data)
+        ax.set_xlabel(left_col)
+        ax.set_ylabel(right_col)
+
+        canvas = FigureCanvasTkAgg(fig, master=parent)
+        canvas.draw()
+
+        return canvas.get_tk_widget()
+
+    def dashboard_graph(self, parent, left_col, right_col, group_by_col) -> tk.Widget:
+        """
+        Creates a graph for the dashboard.
+
+        :param parent: The parent tkinter widget where the graph will be embedded.
+        :param left_col: The name of the column to be plotted on the x-axis.
+        :param right_col: The name of the column to be plotted on the y-axis.
+        :param group_by_col: The column by which the data will be grouped.
+        :return: The Tkinter widget containing the dashboard graph.
+        """
+        if isinstance(self.selected_games, pd.DataFrame):
+            data = self.selected_games.copy()
+        else:
+            data = self.get_data().copy()
+        top_left_values = data[left_col].str.split(",").explode().value_counts().nlargest(5).index
+        data[left_col] = data[left_col].apply(lambda x: [val for val in x.split(",") if val in top_left_values])
+
+        fig, ax = plt.subplots(figsize=(10, 8))
+
+        if group_by_col == "None" or left_col == group_by_col:
+            data.explode(left_col).groupby(left_col)[right_col].mean().plot(kind="bar", ax=ax)
+        else:
+            top_values = data[group_by_col].str.split(",").explode().value_counts().nlargest(5).index
+            data[group_by_col] = data[group_by_col].apply(lambda x: [val for val in x.split(",") if val in top_values])
+            grouped_data = data.explode(left_col).explode(group_by_col).groupby([left_col, group_by_col])[
+                right_col].mean().unstack()
+            grouped_data.plot(kind="bar", ax=ax)
+
+        ax.set_xticklabels(labels=top_left_values.to_list(), rotation=0)
+        ax.set_xlabel(left_col)
+        ax.set_ylabel(right_col)
+        ax.legend()
+        ax.grid()
+
+        canvas = FigureCanvasTkAgg(fig, master=parent)
+        canvas.draw()
+
+        return canvas.get_tk_widget()
