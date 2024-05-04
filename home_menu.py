@@ -44,16 +44,24 @@ class HomeMenu(tk.Frame):
         dashboard_frame = tk.LabelFrame(self, text="Dashboard", foreground="white", background="#2A475E", **option)
         dashboard_frame.pack(pady=20)
 
-        insights_dash_button = tk.Button(dashboard_frame, text="Games Insights Dashboard", **option)
+        insights_dash_button = tk.Button(dashboard_frame, text="Games Insights Dashboard",
+                                         command=lambda: self.parent.change_to_menu(self.parent.dashboard_menu),
+                                         **option)
         insights_dash_button.grid(row=0, column=0, sticky="nsew", **padding)
 
-        prices_dis_button = tk.Button(dashboard_frame, text="Games Prices Distribution", **option)
+        prices_dis_button = tk.Button(dashboard_frame, text="Games Prices Distribution",
+                                      command=lambda: self.parent.change_to_menu(self.parent.price_dist_menu),
+                                      **option)
         prices_dis_button.grid(row=0, column=1, sticky="nsew", **padding)
 
-        relationships_button = tk.Button(dashboard_frame, text="Games Relationships", **option)
+        relationships_button = tk.Button(dashboard_frame, text="Games Relationships",
+                                         command=lambda: self.parent.change_to_menu(self.parent.relationship_menu),
+                                         **option)
         relationships_button.grid(row=1, column=0, sticky="nsew", **padding)
 
-        released_year_button = tk.Button(dashboard_frame, text="Games released each year", **option)
+        released_year_button = tk.Button(dashboard_frame, text="Games released each year",
+                                         command=lambda: self.parent.change_to_menu(self.parent.released_year_menu),
+                                         **option)
         released_year_button.grid(row=1, column=1, sticky="nsew", **padding)
 
     def key_release_search_bar(self, *args) -> None:
@@ -71,4 +79,4 @@ class HomeMenu(tk.Frame):
         """
         self.parent.search_menu.search_entry.set(self.search_entry.get())
         self.parent.search_menu.search()
-        self.parent.switch_to_search_menu()
+        self.parent.change_to_menu(self.parent.search_menu)
