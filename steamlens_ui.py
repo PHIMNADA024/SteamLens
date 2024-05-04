@@ -66,8 +66,7 @@ class SteamLensUI(tk.Tk):
                          background="#1B2838", foreground="white")
         title.pack(fill=tk.X)
 
-        # TODO: Change this to Home menu before push
-        self.dashboard_menu.pack(**padding)
+        self.home_menu.pack(**padding)
 
     def change_to_menu(self, new_menu):
         padding = {'padx': 20, 'pady': 20}
