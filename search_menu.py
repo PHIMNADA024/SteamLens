@@ -1,6 +1,7 @@
 import tkinter as tk
 from tkinter import ttk
 from tkinter import messagebox
+import pandas as pd
 from search_controller import SearchController
 from search_bar import SearchBar
 
@@ -20,6 +21,7 @@ class SearchMenu(tk.Frame):
         super().__init__(parent, **kwargs)
         self.config(background="#2A475E")
         self.font = font
+        self.parent = parent
         self.search_entry = tk.StringVar()
         self.category_selected = tk.StringVar()
         self.category_selected.set("None")
@@ -46,7 +48,8 @@ class SearchMenu(tk.Frame):
         self.search_frame_option(option, padding)
         self.games_library_table_option(option, padding)
         self.selected_games_table_option(option, padding)
-        self.insight_button = tk.Button(self, text="Compare", font=(self.font, 12))
+        self.insight_button = tk.Button(self, text="Compare", font=(self.font, 12), command=self.compare_games)
+        self.insight_button.bind("<Return>", self.compare_games)
         self.insight_button.pack(pady=10)
 
     def search_frame_option(self, option, padding) -> None:
@@ -71,17 +74,16 @@ class SearchMenu(tk.Frame):
         available_platform.grid(row=1, column=0, sticky="w", **padding)
 
         categories_label = tk.Label(search_frame, text="Categories",
-                                      foreground="white", background="#2A475E", **option)
+                                    foreground="white", background="#2A475E", **option)
         categories_label.grid(row=1, column=1, **padding)
         self.category_selected.trace_add("write", self.check_enable_search)
-
 
         categories_option = ttk.Combobox(search_frame, state="readonly", textvariable=self.category_selected, **option)
         categories_option['values'] = self.search_controller.get_unique_categories()
         categories_option.grid(row=2, column=1, **padding)
 
         genres_label = tk.Label(search_frame, text="Genres",
-                                      foreground="white", background="#2A475E", **option)
+                                foreground="white", background="#2A475E", **option)
         genres_label.grid(row=1, column=2, **padding)
 
         genres_option = ttk.Combobox(search_frame, state="readonly", textvariable=self.genre_selected, **option)
@@ -90,8 +92,8 @@ class SearchMenu(tk.Frame):
         self.genre_selected.trace_add("write", self.check_enable_search)
 
         tags_label = tk.Label(search_frame, text="Tags",
-                                      foreground="white", background="#2A475E", **option)
-        tags_label.grid(row=1, column=3,  **padding)
+                              foreground="white", background="#2A475E", **option)
+        tags_label.grid(row=1, column=3, **padding)
 
         tags_option = ttk.Combobox(search_frame, state="readonly", textvariable=self.tag_selected, **option)
         tags_option['values'] = self.search_controller.get_unique_tags()
@@ -130,10 +132,10 @@ class SearchMenu(tk.Frame):
         self.sorted_option.bind("<<ComboboxSelected>>", self.check_enable_search)
 
         self.descending_checkbutton = tk.Checkbutton(search_frame, text="Descending order",
-                                                variable=self.descending_selected, state=tk.DISABLED,
-                                                background="#2A475E", activebackground="#2A475E",
-                                                foreground="white", activeforeground="white",
-                                                selectcolor="black", **option)
+                                                     variable=self.descending_selected, state=tk.DISABLED,
+                                                     background="#2A475E", activebackground="#2A475E",
+                                                     foreground="white", activeforeground="white",
+                                                     selectcolor="black", **option)
         self.descending_checkbutton.grid(row=4, column=3, sticky="w", padx=10)
 
         self.descending_selected.trace_add("write", self.check_enable_search)
@@ -148,13 +150,30 @@ class SearchMenu(tk.Frame):
         else:
             self.descending_checkbutton.config(state=tk.NORMAL)
 
-    def check_enable_search(self, *args):
+    def compare_games(self) -> None:
+        """
+        Compares the selected games.
+        """
+        selected_games = [self.selected_games_table.item(item)['values']
+                          for item in self.selected_games_table.get_children()]
+        if not selected_games:
+            messagebox.showwarning("Warning", "You must select any game to compare them.")
+            return
+
+        selected_games_df = pd.DataFrame(selected_games, columns=self.search_controller.get_data_columns())
+        for column in self.search_controller.get_sorting_attributes()[1:]:
+            selected_games_df[column] = selected_games_df[column].astype(float)
+        self.parent.dashboard_menu.graph_controller.selected_games = selected_games_df
+        self.parent.dashboard_menu.update_attributes()
+        self.parent.change_to_menu(self.parent.dashboard_menu)
+
+    def check_enable_search(self, *args) -> None:
         """
         Checks if the search button should be enabled based on the selected criteria.
         """
         if (self.windows_selected.get() or self.mac_selected.get() or self.linux_selected.get() or
-            self.category_selected.get() != "None" or self.genre_selected.get() != "None" or
-            self.tag_selected.get() != "None" or self.sorted_attribute_selected.get() != "None"):
+                self.category_selected.get() != "None" or self.genre_selected.get() != "None" or
+                self.tag_selected.get() != "None" or self.sorted_attribute_selected.get() != "None"):
             self.search_button.config(foreground="black", state=tk.NORMAL)
         else:
             self.search_button.config(foreground="gray", state=tk.DISABLED)
@@ -170,7 +189,7 @@ class SearchMenu(tk.Frame):
         library_text.pack(ipady=10, **padding)
 
         self.games_library_table = ttk.Treeview(self, columns=self.search_controller.get_data_columns(),
-                                           selectmode="browse", show="headings", height=5)
+                                                selectmode="browse", show="headings", height=5)
         for column in self.search_controller.get_data_columns():
             self.games_library_table.column(column, width=80)
             self.games_library_table.heading(column, text=column)
@@ -196,15 +215,17 @@ class SearchMenu(tk.Frame):
         selected_games_text.pack(ipady=10, **padding)
 
         self.selected_games_table = ttk.Treeview(self, columns=self.search_controller.get_data_columns(),
-                                           selectmode="browse", show="headings", height=5)
+                                                 selectmode="browse", show="headings", height=5)
 
         for column in self.search_controller.get_data_columns():
             self.selected_games_table.column(column, width=80)
             self.selected_games_table.heading(column, text=column)
 
+        self.selected_games_table.bind("<Double-Button-1>", func=self.deselect_game)
         self.selected_games_table.pack(padx=40)
 
-        self.selected_games_scrollbar = ttk.Scrollbar(self, orient="horizontal", command=self.selected_games_table.xview)
+        self.selected_games_scrollbar = ttk.Scrollbar(self, orient="horizontal",
+                                                      command=self.selected_games_table.xview)
         self.selected_games_scrollbar.pack(fill=tk.BOTH, expand=True, padx=40)
 
         self.selected_games_table.config(xscrollcommand=self.selected_games_scrollbar.set)
@@ -263,6 +284,16 @@ class SearchMenu(tk.Frame):
             messagebox.showwarning("Warning", "You cannot select the same game twice.")
         else:
             self.selected_games_table.insert('', 'end', values=selected_game)
+
+    def deselect_game(self, *args) -> None:
+        """
+        Remove the selected game from the selected games table
+        """
+
+        try:
+            self.selected_games_table.delete(self.selected_games_table.selection()[0])
+        except IndexError:
+            pass
 
     def check_duplicate(self, selected_game) -> bool:
         """
