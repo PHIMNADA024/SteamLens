@@ -3,6 +3,7 @@ from data_loader import DataLoader
 import pandas as pd
 import matplotlib
 import matplotlib.pyplot as plt
+from matplotlib.figure import Figure
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import numpy as np
 
@@ -116,13 +117,10 @@ class GraphController:
         data["Genres"] = data["Genres"].copy().str.split(",").explode('Genres')
         data["Release Year"] = data["Release date"].str.slice(-4).astype('int')
 
-        # Count the number of games for each genre and year
         genre_counts = data.groupby(['Release Year', 'Genres']).size().unstack(fill_value=0)
 
-        # Find the top 5 genres with the most games released each year
         top_genres = genre_counts.sum().nlargest(5).index
 
-        # Plot lines for the top 5 genres
         ax = genre_counts[top_genres].plot(figsize=(10, 6), marker='o', linestyle='-')
 
         # Set titles and labels
@@ -133,7 +131,6 @@ class GraphController:
         ax.set_xticks(years)
         xtick_labels = [year if year % 5 == 0 else "" for year in years]
         ax.set_xticklabels(xtick_labels, rotation=90)
-        # ax.set_xticklabels(years, rotation=90)
 
         ax.grid()
 
@@ -150,7 +147,8 @@ class GraphController:
         :param right_col: The name of the column to be plotted on the y-axis.
         :return: The Tkinter widget containing the scatter plot.
         """
-        fig, ax = plt.subplots(figsize=(8, 6))
+        fig = Figure(figsize=(8, 6))
+        ax = fig.add_subplot(111)
 
         data = self.get_data()
         x_data = data[left_col]
@@ -182,7 +180,8 @@ class GraphController:
         top_left_values = data[left_col].str.split(",").explode().value_counts().nlargest(5).index
         data[left_col] = data[left_col].apply(lambda x: [val for val in x.split(",") if val in top_left_values])
 
-        fig, ax = plt.subplots(figsize=(10, 8))
+        fig = Figure(figsize=(10, 8))
+        ax = fig.add_subplot(111)
 
         if group_by_col == "None" or left_col == group_by_col:
             data.explode(left_col).groupby(left_col)[right_col].mean().plot(kind="bar", ax=ax)
