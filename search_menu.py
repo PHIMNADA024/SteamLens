@@ -4,6 +4,7 @@ from tkinter import messagebox
 import pandas as pd
 from search_controller import SearchController
 from search_bar import SearchBar
+from threading import Thread
 
 
 class SearchMenu(tk.Frame):
@@ -68,6 +69,7 @@ class SearchMenu(tk.Frame):
         self.search_bar = SearchBar(search_frame, option, self.search_entry, self.search_button, width=35)
         self.search_bar.bind("<Return>", self.search)
         self.search_bar.grid(row=0, column=0, columnspan=3, sticky="nsew", **padding)
+        self.search_entry.trace_add("write", self.check_enable_search)
 
         available_platform = tk.Label(search_frame, text="Available platform",
                                       foreground="white", background="#2A475E", **option)
@@ -140,6 +142,7 @@ class SearchMenu(tk.Frame):
 
         self.descending_selected.trace_add("write", self.check_enable_search)
         self.sorted_option.bind("<<ComboboxSelected>>", self.toggle_descending_state)
+        self.sorted_attribute_selected.trace_add("write", self.check_enable_search)
 
     def toggle_descending_state(self, *args) -> None:
         """
@@ -164,16 +167,17 @@ class SearchMenu(tk.Frame):
         for column in self.search_controller.get_sorting_attributes()[1:]:
             selected_games_df[column] = selected_games_df[column].astype(float)
         self.parent.dashboard_menu.graph_controller.selected_games = selected_games_df
-        self.parent.dashboard_menu.update_attributes()
+        self.parent.dashboard_menu.update_graph()
         self.parent.change_to_menu(self.parent.dashboard_menu)
 
     def check_enable_search(self, *args) -> None:
         """
         Checks if the search button should be enabled based on the selected criteria.
         """
-        if (self.windows_selected.get() or self.mac_selected.get() or self.linux_selected.get() or
-                self.category_selected.get() != "None" or self.genre_selected.get() != "None" or
-                self.tag_selected.get() != "None" or self.sorted_attribute_selected.get() != "None"):
+        if (self.search_entry.get() and self.search_entry.get() != "Search game..." or self.windows_selected.get() or
+                self.mac_selected.get() or self.linux_selected.get() or self.category_selected.get() != "None" or
+                self.genre_selected.get() != "None" or self.tag_selected.get() != "None" or
+                self.sorted_attribute_selected.get() != "None"):
             self.search_button.config(foreground="black", state=tk.NORMAL)
         else:
             self.search_button.config(foreground="gray", state=tk.DISABLED)
@@ -236,7 +240,7 @@ class SearchMenu(tk.Frame):
 
         :param search_results: List of search results.
         """
-
+        self.games_library_table.delete(*self.games_library_table.get_children())
         [self.games_library_table.insert('', 'end', iid=result[0], values=result)
          for result in search_results]
 
@@ -244,11 +248,6 @@ class SearchMenu(tk.Frame):
         """
         Executes the search operation based on user inputs.
         """
-        for old_data in self.games_library_table.get_children():
-            try:
-                self.games_library_table.delete(old_data)
-            except tk.TclError:
-                pass
         if self.search_entry.get() == "Search game...":
             search_entry = ""
         else:
@@ -265,15 +264,21 @@ class SearchMenu(tk.Frame):
         )
 
         if self.sorted_attribute_selected.get() == "None":
-            self.insert_search_result(search_result.to_numpy().tolist()[:100])
+            sorting_thread = Thread(target=lambda: self.insert_search_result(search_result.to_numpy().tolist()[:100]))
+            sorting_thread.start()
         else:
             if self.descending_selected.get():
-                self.insert_search_result(
+                sorting_thread = Thread(target=lambda: self.insert_search_result(
                     search_result.sort_values(self.sorted_attribute_selected.get(), ascending=False).
-                    to_numpy().tolist()[:100])
+                    to_numpy().tolist()[:100]
+                ))
+                sorting_thread.start()
             else:
-                self.insert_search_result(search_result.sort_values(self.sorted_attribute_selected.get()).
-                                          to_numpy().tolist()[:100])
+                sorting_thread = Thread(target=lambda: self.insert_search_result(
+                    search_result.sort_values(self.sorted_attribute_selected.get()).
+                    to_numpy().tolist()[:100]
+                ))
+                sorting_thread.start()
 
     def insert_selected_game(self, *args) -> None:
         """
