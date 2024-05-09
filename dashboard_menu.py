@@ -68,7 +68,6 @@ class DashboardMenu(tk.Frame):
 
         self.loading_label = tk.Label(self, text="Loading...", foreground="white", background="#2A475E", **option)
 
-
         self.graph_widget = self.graph_controller.dashboard_graph(self, self.column_left_selected.get(),
                                                                   self.column_right_selected.get(),
                                                                   self.group_by_selected.get())
