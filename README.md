@@ -7,6 +7,10 @@ SteamLens utilizes a dataset comprising Steam game data for processing and visua
 ## SteamLens UI
 * [SteamLens Screenshots](https://github.com/PHIMNADA024/SteamLens/wiki/Design-Documents)
 
+## Requirements
+* python >= 3.9
+* Git LFS
+
 ## Installation
 1. Install [Git LFS](https://docs.github.com/en/repositories/working-with-files/managing-large-files/installing-git-large-file-storage) by following the steps from this page first.
    - It is required for the data file that is currently stored in Git Large File Storage.
@@ -22,13 +26,11 @@ cd SteamLens
 ```
 git lfs pull
 ```
-
-## How to run
-1. Create a Python Virtual Environment. (If it doesn't work, please use `python3` instead of `python`)
+5. Create a Python Virtual Environment. (If it doesn't work, please use `python3` instead of `python`)
 ```
 python -m venv venv
 ```
-2. Activate the virtual environment.
+6. Activate the virtual environment.
    - Linux and macOS
    ``` 
    source venv/bin/activate 
@@ -37,14 +39,26 @@ python -m venv venv
    ```  
    .\venv\Scripts\activate
    ```
-3. Install dependencies.
+7. Install dependencies.
 ```
 pip install -r requirements.txt
 ```
-4. Run the program. (If it doesn't work, please use `python3` instead of `python`)
+
+## How to run
+1. Activate the virtual environment.
+   - Linux and macOS
+   ``` 
+   source venv/bin/activate 
+   ```
+   - Windows
+   ```  
+   .\venv\Scripts\activate
+   ```
+2. Run the program. (If it doesn't work, please use `python3` instead of `python`)
 ```
 python main.py
 ```
+
 ## SteamLens Wiki Page
 * [SteamLens Wiki](https://github.com/PHIMNADA024/SteamLens/wiki)
 
