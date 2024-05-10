@@ -5,7 +5,18 @@ SteamLens is a GUI data processing and visualization for steam games.
 SteamLens utilizes a dataset comprising Steam game data for processing and visualization, <br>encompassing information such as game name, release date, price, supported operating systems (Windows, Mac, Linux), <br>user scores, positive and negative votes, developers, publishers, categories, genres, and tags.
 
 ## SteamLens UI
-* [SteamLens Screenshots](https://github.com/PHIMNADA024/SteamLens/wiki/Design-Documents)
+### Home menu
+![SteamLens_home_menu.png](screenshots%2FSteamLens_home_menu.png)
+### Search menu
+![SteamLens_search_menu.png](screenshots%2FSteamLens_search_menu.png)
+### Game price distribution menu
+![SteamLens_price_dist_menu.png](screenshots%2FSteamLens_price_dist_menu.png)
+### Game relationship menu
+![SteamLens_relationship_menu.png](screenshots%2FSteamLens_relationship_menu.png)
+### Game released each year menu
+![SteamLens_released_year_menu.png](screenshots%2FSteamLens_released_year_menu.png)
+### Game insights dashboard menu
+![SteamLens_dashboard_menu.png](screenshots%2FSteamLens_dashboard_menu.png)
 
 ## Requirements
 * python >= 3.9
