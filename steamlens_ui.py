@@ -70,7 +70,12 @@ class SteamLensUI(tk.Tk):
 
         self.home_menu.pack(**padding)
 
-    def change_to_menu(self, new_menu):
+    def change_to_menu(self, new_menu) -> None:
+        """
+        Changes the current menu displayed on the UI.
+
+        :param new_menu: The menu to be displayed.
+        """
         padding = {'padx': 20, 'pady': 20}
 
         for menu in self.menus:
