@@ -1,6 +1,12 @@
 # SteamLens
 SteamLens is a GUI data processing and visualization for steam games.
 
+## Description
+SteamLens utilizes a dataset comprising Steam game data for processing and visualization, <br>encompassing information such as game name, release date, price, supported operating systems (Windows, Mac, Linux), <br>user scores, positive and negative votes, developers, publishers, categories, genres, and tags.
+
+## SteamLens UI
+* [SteamLens Screenshots](https://github.com/PHIMNADA024/SteamLens/wiki/Design-Documents)
+
 ## Installation
 1. Install [Git LFS](https://docs.github.com/en/repositories/working-with-files/managing-large-files/installing-git-large-file-storage) by following the steps from this page first.
    - It is required for the data file that is currently stored in Git Large File Storage.
@@ -39,3 +45,14 @@ pip install -r requirements.txt
 ```
 python main.py
 ```
+## SteamLens Wiki Page
+* [SteamLens Wiki](https://github.com/PHIMNADA024/SteamLens/wiki)
+
+## Project Documents
+* [Project Proposal](https://docs.google.com/document/d/1GnFoABUNMin5Rpu-b2_vQP5a0CFT8EuwDSRImBIfSxE/edit?usp=sharing)
+* [Development Plan](https://github.com/PHIMNADA024/SteamLens/wiki/Weekly-Plan)
+* [UML Class Diagram](https://github.com/PHIMNADA024/SteamLens/wiki/UML-Class-Diagram)
+* [UML Sequence Diagram](https://github.com/PHIMNADA024/SteamLens/wiki/UML-Sequence-Diagram)
+
+## SteamLens Data
+* [SteamLens Dataset](https://www.kaggle.com/datasets/fronkongames/steam-games-dataset)
