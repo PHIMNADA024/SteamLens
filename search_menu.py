@@ -228,11 +228,11 @@ class SearchMenu(tk.Frame):
         self.selected_games_table.bind("<Double-Button-1>", func=self.deselect_game)
         self.selected_games_table.pack(padx=40)
 
-        self.selected_games_scrollbar = ttk.Scrollbar(self, orient="horizontal",
+        selected_games_scrollbar = ttk.Scrollbar(self, orient="horizontal",
                                                       command=self.selected_games_table.xview)
-        self.selected_games_scrollbar.pack(fill=tk.BOTH, expand=True, padx=40)
+        selected_games_scrollbar.pack(fill=tk.BOTH, expand=True, padx=40)
 
-        self.selected_games_table.config(xscrollcommand=self.selected_games_scrollbar.set)
+        self.selected_games_table.config(xscrollcommand=selected_games_scrollbar.set)
 
     def insert_search_result(self, search_results) -> None:
         """
