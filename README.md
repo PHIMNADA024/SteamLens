@@ -81,3 +81,7 @@ python main.py
 
 ## SteamLens Data
 * [SteamLens Dataset](https://www.kaggle.com/datasets/fronkongames/steam-games-dataset)
+
+## SteamLens Videos
+* [SteamLens Tutorial](https://drive.google.com/file/d/1WSx2U-twGqF8Z7QRK6l07Ttx32BeWlIn/view?usp=sharing)
+* [SteamLens](https://drive.google.com/file/d/1fFkBN_aGm1_-kgyZNb0obAXeOBzmjO6z/view?usp=sharing)
